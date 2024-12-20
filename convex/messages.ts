@@ -1,8 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { api } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
-import { Message } from "./types";
 
 export const sendTextMessage = mutation({
 	args: {

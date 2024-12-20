@@ -14,11 +14,11 @@ import { SignIn } from "@clerk/nextjs";
 
 const LeftPanel = () => {
 	const { isAuthenticated, isLoading } = useConvexAuth();
-	const { selectedConversation, setSelectedConversation } = useConversationStore();
+	const { selectedConversation, setSelectedConversation, conversations: storedConversations, pinAIContact } = useConversationStore();
 
 	const me = useQuery(api.users.getMe, isAuthenticated ? undefined : "skip");
 	const createUser = useMutation(api.users.createInitialUser);
-	const conversations = useQuery(
+	const fetchedConversations = useQuery(
 		api.conversations.getMyConversations,
 		isAuthenticated ? undefined : "skip"
 	);
@@ -31,11 +31,17 @@ const LeftPanel = () => {
 	}, [me, isAuthenticated, createUser]);
 
 	useEffect(() => {
-		const conversationIds = conversations?.map((conversation) => conversation._id);
+		const conversationIds = fetchedConversations?.map((conversation) => conversation._id);
 		if (selectedConversation && conversationIds && !conversationIds.includes(selectedConversation._id)) {
 			setSelectedConversation(null);
 		}
-	}, [conversations, selectedConversation, setSelectedConversation]);
+	}, [fetchedConversations, selectedConversation, setSelectedConversation]);
+
+	useEffect(() => {
+		if (storedConversations.length > 0) {
+			pinAIContact();
+		}
+	}, [storedConversations]);
 
 	if (!isAuthenticated || isLoading) {
 		return (
@@ -96,11 +102,11 @@ const LeftPanel = () => {
 			{/* Chat List */}
 			<div className='my-3 flex flex-col gap-0 max-h-[80%] overflow-auto'>
 				{/* Conversations will go here*/}
-				{conversations?.map((conversation) => (
+				{fetchedConversations?.map((conversation) => (
 					<Conversation key={conversation._id} conversation={conversation} />
 				))}
 
-				{conversations?.length === 0 && (
+				{fetchedConversations?.length === 0 && (
 					<>
 						<p className='text-center text-gray-500 text-sm mt-3'>No conversations yet</p>
 						<p className='text-center text-gray-500 text-sm mt-3 '>

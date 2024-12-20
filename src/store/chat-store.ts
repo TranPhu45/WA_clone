@@ -7,6 +7,7 @@ export type Conversation = {
 	image?: string;
 	participants: Id<"users">[];
 	isGroup: boolean;
+	isAIAgent?: boolean;
 	name?: string;
 	groupImage?: string;
 	groupName?: string;
@@ -22,12 +23,21 @@ export type Conversation = {
 
 type ConversationStore = {
 	selectedConversation: Conversation | null;
+	conversations: Conversation[];
 	setSelectedConversation: (conversation: Conversation | null) => void;
+	pinAIContact: () => void;
 };
 
-export const useConversationStore = create<ConversationStore>((set) => ({
+export const useConversationStore = create<ConversationStore>((set, get) => ({
 	selectedConversation: null,
+	conversations: [],
 	setSelectedConversation: (conversation) => set({ selectedConversation: conversation }),
+	pinAIContact: () => {
+		const aiContact = get().conversations.find(convo => convo.isAIAgent);
+		if (aiContact) {
+			set({ selectedConversation: aiContact });
+		}
+	},
 }));
 
 export interface IMessage {

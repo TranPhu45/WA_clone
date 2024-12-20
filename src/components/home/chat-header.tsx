@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import toast from "react-hot-toast";
 import DeleteConfirmDialog from "./delete-conversation-dialog";
@@ -7,6 +7,7 @@ import { Conversation } from "@/store/chat-store";
 import { Trash2, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useConvexAuth } from "convex/react";
 
 interface ChatHeaderProps {
   conversation: Conversation;
@@ -15,8 +16,24 @@ interface ChatHeaderProps {
 const ChatHeader = ({ conversation }: ChatHeaderProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const deleteConversation = useMutation(api.conversations.deleteConversation);
+  const { isAuthenticated } = useConvexAuth();
+
+  let currentUser;
+  if (isAuthenticated) {
+    currentUser = useQuery(api.users.getCurrentUser);
+  }
+
+  if (!isAuthenticated) {
+    return <div>Vui lòng đăng nhập để truy cập tính năng này.</div>;
+  }
+
+  const isAIAgent = currentUser?.email === 'aiagenttest@gmail.com';
 
   const handleConfirmDelete = async () => {
+    if (isAIAgent) {
+      toast.error("Tài khoản AI Agent không thể xóa cuộc trò chuyện.");
+      return;
+    }
     try {
       await deleteConversation({ id: conversation._id });
       setShowDeleteDialog(false);
@@ -55,6 +72,7 @@ const ChatHeader = ({ conversation }: ChatHeaderProps) => {
           variant="ghost"
           size="icon"
           className="text-red-500 hover:text-red-700"
+          disabled={isAIAgent}
         >
           <Trash2 className="w-5 h-5" />
         </Button>

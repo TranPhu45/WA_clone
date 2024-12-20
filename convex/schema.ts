@@ -16,6 +16,7 @@ export default defineSchema({
 		groupName: v.optional(v.string()),
 		groupImage: v.optional(v.string()),
 		admin: v.optional(v.id("users")),
+		isAIAgent: v.optional(v.boolean()),
 	}),
 
 	messages: defineTable({

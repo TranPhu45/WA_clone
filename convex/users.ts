@@ -283,3 +283,41 @@ export const removeDuplicateUsers = mutation({
     }
   }
 });
+export const getUserByEmail = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), args.email))
+      .first();
+
+    if (!user) {
+      console.warn(`User with email ${args.email} not found`);
+      return null; // Trả về null nếu không tìm thấy người dùng
+    }
+
+    return user;
+  },
+});
+
+export const getCurrentUser = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      console.warn("Không tìm thấy thông tin xác thực. Người dùng cần đăng nhập lại.");
+      throw new ConvexError("Not authenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .first();
+
+    if (!user) {
+      console.warn(`Không tìm thấy người dùng với tokenIdentifier: ${identity.tokenIdentifier}`);
+      throw new ConvexError("User not found");
+    }
+
+    return user;
+  },
+});
