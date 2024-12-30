@@ -6,16 +6,20 @@ interface DeleteConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  isAIConversation: boolean;
 }
 
-const DeleteConfirmDialog = ({ isOpen, onClose, onConfirm }: DeleteConfirmDialogProps) => {
+const DeleteConfirmDialog = ({ isOpen, onClose, onConfirm, isAIConversation }: DeleteConfirmDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-gray-primary dark:bg-gray-tertiary">
         <DialogTitle className="text-foreground">Confirm Deletion</DialogTitle>
         <DialogDescription className="text-muted-foreground">
-          Are you sure you want to delete this conversation?
+          {isAIConversation 
+              ? "This conversation with AI Agent cannot be deleted."
+              : "Are you sure you want to delete this conversation?"}
         </DialogDescription>
+
         <div className="flex justify-end gap-3 mt-4">
           <Button 
             variant="outline"
@@ -25,13 +29,15 @@ const DeleteConfirmDialog = ({ isOpen, onClose, onConfirm }: DeleteConfirmDialog
           >
             No
           </Button>
-          <Button 
-            variant="destructive"
-            onClick={onConfirm}
-            className="w-24"
-          >
-            Yes
-          </Button>
+          {!isAIConversation && (
+    <Button 
+        variant="destructive"
+        onClick={onConfirm}
+        className="w-24"
+    >
+        Yes
+    </Button>
+)}
         </div>
       </DialogContent>
     </Dialog>

@@ -30,19 +30,20 @@ const ChatHeader = ({ conversation }: ChatHeaderProps) => {
   const isAIAgent = currentUser?.email === 'aiagenttest@gmail.com';
 
   const handleConfirmDelete = async () => {
-    if (isAIAgent) {
-      toast.error("Tài khoản AI Agent không thể xóa cuộc trò chuyện.");
-      return;
+    if (conversation.isAIAgent) {
+        toast.error("Cannot delete AI Agent conversation.");
+        return;
     }
     try {
-      await deleteConversation({ id: conversation._id });
-      setShowDeleteDialog(false);
-      toast.success("Conversation deleted");
+        await deleteConversation({ id: conversation._id });
+        setShowDeleteDialog(false);
+        toast.success("Conversation deleted.");
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete conversation");
+        console.error(err);
+        toast.error("Failed to delete conversation.");
     }
-  };
+};
+
 
   return (
     <div className="p-4 flex items-center justify-between border-b">
@@ -68,20 +69,27 @@ const ChatHeader = ({ conversation }: ChatHeaderProps) => {
           <Video className="w-5 h-5" />
         </Button>
         <Button
-          onClick={() => setShowDeleteDialog(true)}
-          variant="ghost"
-          size="icon"
-          className="text-red-500 hover:text-red-700"
-          disabled={isAIAgent}
-        >
-          <Trash2 className="w-5 h-5" />
-        </Button>
+    onClick={() => {
+        if (conversation.isAIAgent) {
+            toast.error("Cannot delete AI Agent conversation.");
+        } else {
+            setShowDeleteDialog(true);
+        }
+    }}
+    variant="ghost"
+    size="icon"
+    className="text-red-500 hover:text-red-700"
+    disabled={conversation.isAIAgent}
+>
+    <Trash2 className="w-5 h-5" />
+</Button>
       </div>
 
       <DeleteConfirmDialog
         isOpen={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
         onConfirm={handleConfirmDelete}
+        isAIConversation={!!conversation.isAIAgent}
       />
     </div>
   );

@@ -69,7 +69,18 @@ const Conversation = ({ conversation }: { conversation: any }) => {
                         <span className='text-xs text-gray-500 ml-auto'>
                             {formatDate(lastMessage?._creationTime || conversation._creationTime)}
                         </span>
-                        <button onClick={(e) => { e.stopPropagation(); setIsDialogOpen(true); }} className='ml-2'>
+                        <button 
+                            onClick={(e) => { 
+                            e.stopPropagation(); 
+                            if (conversation.email !== 'aiagenttest@gmail.com') {
+                                setIsDialogOpen(true);
+                            } else {
+                                toast.error("Cannot delete AI Agent conversation.");
+                            }
+                        }} 
+                        className='ml-2'
+                            disabled={conversation.email === 'aiagenttest@gmail.com'}
+                        >
                             <Trash size={16} />
                         </button>
                     </div>

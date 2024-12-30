@@ -70,7 +70,7 @@ const RightPanel = () => {
         try {
             await navigator.mediaDevices.getUserMedia({ audio: true });
             await conversation.startSession({
-                agentId: "1my7lGFfwhkY65HVYsMO",
+                agentId: "P3y7LUMNmwBqvLW0p4SD",
             });
             setIsCallModalOpen(true);
         } catch (error) {
